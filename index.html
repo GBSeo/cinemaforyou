@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>당신을 위한 영화관</title>
+    <style type="text/css">
+        body{
+            padding: 0;
+            margin: 0;
+            background-color: black;
+            overflow: hidden;}
+
+        .wrapper{
+            width: 1920px; 
+            height: auto; 
+            margin: 0; 
+            padding: 0;
+            position: relative;
+            left: 50%;
+            transform: translateX(-50%);}
+
+        .wrapper img{
+            display: block;
+            width: 1900px;
+            height: auto;
+            position: absolute;
+            z-index: -1;}
+
+        #webcam {
+            position: absolute;
+            top: 101px; /* 스크린 위치 조정 */
+            left: 249px;
+            transform: scaleX(-1);
+            width: 1405px; /* 스크린 크기 조정 */
+            height: 436px;
+            object-fit: cover;
+            }
+
+        .txt h1{
+            position: absolute;
+            top:430px;
+            left: 50%; /* 가로 방향으로 중앙 정렬 */
+            transform: translateX(-50%); /* 가로 방향으로만 이동 */
+            color: yellow;
+            z-index: 999;
+            font-family: Helvetica;
+            font-style: italic;
+            text-shadow: -1px 0 #000, 0 1px #000, 1px 0 #000, 0 -1px #000;
+            cursor: pointer; /* 커서 포인터로 변경 */
+        }
+
+        #filter-buttons button {
+            border-radius: 20px;
+            margin: 0 3px;
+            padding: 12px 20px;
+            border: 0px solid #333;
+            background-color: #fff;
+            cursor: pointer;}
+
+        #filter-buttons {
+            position:fixed;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;}
+
+        #floating-buttons {
+            position: fixed;
+            bottom: 45px;
+            right: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;}
+
+        .floating-btn {
+            background-color: #007bff;
+            border: none;
+            color: white;
+            padding: 0px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 0px 0;
+            border-radius: 50%;
+            width: 60px; /* 너비 설정 */
+            height: 60px; /* 높이 설정 */
+            cursor: pointer;}
+
+        .floating-btn img {
+            width: 25px; /* 아이콘 크기 조정 */
+            height: 25px; /* 아이콘 크기 조정 */
+            vertical-align: middle;
+        }
+
+        #text-input-area {
+        position: fixed;
+        bottom: 50px;
+        left: 50%;
+        transform: translateX(-50%);
+        text-align: center;}
+
+        #user-input {
+            padding: 10px;
+            border: 2px solid #fff;
+            background-color: transparent;
+            color: white;
+            border-radius: 5px;
+            width: 200px;}
+
+        #text-input-area button {
+            padding: 10px 15px;
+            margin-left: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;}
+
+        #text-input-area button:hover {
+            background-color: #0056b3;}
+
+        .active-filter {
+            background-color: black; /* 활성화된 필터 버튼의 배경색 */
+            color: #007bff;}
+
+    </style>
+</head>
+
+<body>
+    <section class="wrapper">
+        <img src="cinema.png">
+        <video id="webcam" autoplay></video>
+    </section>
+
+    <section class="wrapper">
+        <img src="cinmea-head.png">
+    </section>
+
+    <div id="filter-buttons" style="text-align:center; position: relative; top: 40px;">
+        <button onclick="applyFilter('none')">기본</button>
+        <button onclick="applyFilter('grayscale(100%) contrast(131%)')">흑백</button>
+        <button onclick="applyFilter('grayscale(33%) contrast(130%) sepia(54%) blur(1px)')">레트로</button>
+        <button onclick="applyFilter('brightness(150%)')">환하게</button>
+    </div>
+
+    <div class="txt">
+        <h1>내가 왕이 될 상인가?</h1>
+    </div>
+
+    <div id="floating-buttons">
+      <button class="floating-btn" onclick="showGif('gif3')">
+           <img src="eye1.svg" alt="숨기기"> <!-- 아이콘 이미지 추가 -->
+      </button>
+  </div>
+
+    <div id="text-input-area" style="position: fixed; bottom: 50px; left: 50%; transform: translateX(-50%);"><input type="text" id="user-input" placeholder="어떤 명대사를 말할까요?"> <button onclick="updateText()">자막 적용</button>
+    </div>
+
+
+    <script type="text/javascript">
+        function applyFilter(filter) {
+            document.getElementById('webcam').style.filter = filter;}
+
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(function(stream) {
+                var video = document.getElementById('webcam');
+                video.srcObject = stream;
+        })
+        .catch(function(error) {
+            console.log("Something went wrong!");
+        });
+
+         function toggleFilterButtons() {
+        var filterButtons = document.getElementById('filter-buttons');
+        var toggleButtonImg = document.querySelector('#floating-buttons .floating-btn img');
+        var textInputArea = document.getElementById('text-input-area');
+        var isHidden = filterButtons.style.display === 'none';
+
+        // 필터 버튼의 display 속성을 토글합니다.
+        filterButtons.style.display = isHidden ? 'block' : 'none';
+         textInputArea.style.display = isHidden ? 'block' : 'none';
+        toggleButtonImg.src = isHidden ? 'eye2.svg' : 'eye1.svg';
+    }
+
+    // 숨기기 버튼에 이벤트 리스너를 추가합니다.
+    document.querySelector('#floating-buttons .floating-btn').addEventListener('click', toggleFilterButtons);
+
+        function updateText() {
+        var userInput = document.getElementById('user-input').value;
+        var textElement = document.querySelector('.txt h1');
+        textElement.textContent = userInput; // 입력된 텍스트를 .txt h1에 적용
+    }
+
+        function applyFilter(filter) {
+            var buttons = document.querySelectorAll('#filter-buttons button');
+            buttons.forEach(function(button) {
+                button.classList.remove('active-filter');
+            });
+
+        document.getElementById('webcam').style.filter = filter;
+        event.currentTarget.classList.add('active-filter');
+    }
+
+    // txt h1 요소에 클릭 이벤트 리스너 추가
+document.querySelector('.txt h1').addEventListener('click', function() {
+    readText(this.textContent);});
+
+// 텍스트를 읽어주는 함수
+function readText(text) {
+    var speech = new SpeechSynthesisUtterance(text);
+    window.speechSynthesis.speak(speech);}
+
+        window.onload = function() {
+        alert("삶이라는 영화의 주인공이 되어보세요. 자막을 누르면 소리가 재생됩니다.");};
+
+ 
+    </script>
+
+</body>
+</html>
